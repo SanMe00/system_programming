@@ -1,0 +1,106 @@
+p=2
+day=1
+mon=1
+date=(31 28 31 30 31 30 31 31 30 31 30 31)
+first_year=1900
+cnt=1
+choice=0
+leap_cnt=0
+comm_cnt=0
+
+echo "----------Calendar Program----------"
+echo -n "Input Year >> " 
+read user_year
+
+if [ ` expr $user_year % 4 ` -eq 0 -a ` expr $user_year % 100 ` -ne 0 -o ` expr $user_year % 400 ` -eq 0 ]
+then	
+	date[1]=29
+fi
+
+while [ $first_year -lt $user_year ]
+do
+  if [ ` expr $first_year % 4 ` -eq 0 -a ` expr $first_year % 100 ` -ne 0 -o ` expr $first_year % 400 ` -eq 0 ]
+    then leap_cnt=` expr $leap_cnt + 1 `
+  else
+    comm_cnt=` expr $comm_cnt + 1 `
+  fi
+  first_year=` expr $first_year + 1 `
+done
+
+p=` expr \( $p + $comm_cnt \* 365 + $leap_cnt \* 366 \) % 7 `
+if [ $p -eq 0 ]
+then
+	p=7
+fi
+
+echo "원하는 메뉴를 선택하세요"
+echo -n "(1)특정한 연도출력 (2)특정한 연도의 달 출력 >> "
+read choice
+if [ $choice -eq 1 ]
+then
+	echo "[ $user_year Calendar ]"
+	for mon in 0 1 2 3 4 5 6 7 8 9 10 11
+	do
+		echo -e "\t\t\t ` expr $mon + 1 `월"
+		echo
+		echo -e "일\t월\t화\t수\t목\t금\t토"
+		while [ $cnt -lt $p ]
+		do
+			echo -en "\t"
+			cnt=` expr $cnt + 1 `
+		done
+		while [ $day -le ${date[mon]} ]
+		do
+			echo -en "$day\t"
+			if [ $p -eq 7 ]
+			then
+				echo
+				p=0
+			fi
+			day=` expr $day + 1 `
+			p=` expr $p + 1 `
+		done
+		day=1
+		cnt=1
+		echo
+		echo
+		echo "---------------------------------------------------"	#문제 시, 이것 제거
+	done
+
+elif [ $choice -eq 2 ]
+then
+	echo -n "Input Month >> "
+	read user_mon
+	echo -e "\t\t\t$user_mon월"
+	echo
+	echo -e "일\t월\t화\t수\t목\t금\t토"
+	while [ $mon -lt $user_mon ]
+	do
+		p=` expr $p + ${date[mon-1]} `	#[mon]에서 [mon-1]로 변경해봄		
+		mon=` expr $mon + 1 `
+	done
+	p=` expr $p % 7 `
+	if [ $p -eq 0 ]
+	then
+		p=7
+	fi
+	while [ $cnt -lt $p ]
+	do
+		echo -en "\t"
+		cnt=` expr $cnt + 1 `
+	done
+	while [ $day -le ${date[user_mon-1]} ]
+        do
+      		echo -en "$day\t"
+		if [ $p -eq 7 ]
+        	then
+       			echo
+        		p=0
+        	fi
+        	day=` expr $day + 1 `
+        	p=` expr $p + 1 `
+        done
+	day=1
+	cnt=1
+	echo
+fi
